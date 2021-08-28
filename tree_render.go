@@ -30,8 +30,6 @@ func Render(root Node, minLeafDistance uint32) string {
 			firstEmptyColumn = vPos.rootColumn + len(v.String())
 		}
 
-		buf.WriteString("\n")
-
 		// 获取下一层的结点
 		var nextLevelNodes []Node
 		for _, v := range curLevelNodes {
@@ -43,6 +41,8 @@ func Render(root Node, minLeafDistance uint32) string {
 		if len(nextLevelNodes) == 0 {
 			return buf.String()
 		}
+
+		buf.WriteString("\n")
 
 		// 写入当前层结点每个结点下边的"|"，对于没有孩子结点的当前层结点不需要写入
 		firstEmptyColumn = 0
