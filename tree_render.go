@@ -32,10 +32,13 @@ func Render(root Node, minLeafDistance uint32) string {
 
 		// 获取下一层的结点
 		var nextLevelNodes []Node
+		maxChildrenCnt := 0
 		for _, v := range curLevelNodes {
-			for _, u := range t.children[v.Id()] {
-				nextLevelNodes = append(nextLevelNodes, u)
+			children := t.children[v.Id()]
+			if maxChildrenCnt < len(children) {
+				maxChildrenCnt = len(children)
 			}
+			nextLevelNodes = append(nextLevelNodes, children...)
 		}
 
 		if len(nextLevelNodes) == 0 {
@@ -57,12 +60,16 @@ func Render(root Node, minLeafDistance uint32) string {
 		}
 		buf.WriteString("\n")
 
-		curLevelNodes = nextLevelNodes
+		// 如果当前层每个结点都只有一个孩子则直接无需写入“同一父结点的孩子写入连续的横线”和“孩子结点上方的"|"”
+		if maxChildrenCnt == 1 {
+			curLevelNodes = nextLevelNodes
+			continue
+		}
 
 		// 同一父结点的孩子写入连续的横线
 		firstEmptyColumn = 0
 		var lastNodeParent Node
-		for _, v := range curLevelNodes {
+		for _, v := range nextLevelNodes {
 			vPos := t.pos[v.Id()]
 			vParent := t.parent[v.Id()]
 
@@ -87,7 +94,7 @@ func Render(root Node, minLeafDistance uint32) string {
 
 		// 写入孩子结点上方的"|"
 		firstEmptyColumn = 0
-		for _, v := range curLevelNodes {
+		for _, v := range nextLevelNodes {
 			vPos := t.pos[v.Id()]
 			writeN(buf, " ", vPos.rootColumn-firstEmptyColumn)
 			buf.WriteString("|")
@@ -95,6 +102,7 @@ func Render(root Node, minLeafDistance uint32) string {
 		}
 
 		buf.WriteString("\n")
+		curLevelNodes = nextLevelNodes
 	}
 
 	return buf.String()
