@@ -9,7 +9,7 @@ type Node interface {
 }
 
 // 生成以root为根的前缀树的可视化表示
-func Render(root Node, minLeafDistance uint32) string {
+func Print(root Node, minLeafDistance uint32) string {
 	t := &tree{
 		pos:             make(map[string]position),
 		children:        make(map[string][]Node),
